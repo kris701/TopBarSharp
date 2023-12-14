@@ -54,6 +54,8 @@ namespace TopBarSharp.Views
                     Process? target = null;
                     for (int i = 0; i < 10; i++)
                     {
+                        if (_stop)
+                            break;
                         target = Process.GetProcesses().SingleOrDefault(p => p.ProcessName == _targetInfo.ProcessName && p.MainWindowTitle == _targetInfo.WindowName);
                         if (target != null)
                         {
@@ -61,7 +63,7 @@ namespace TopBarSharp.Views
                             await Start();
                             return;
                         }
-                        await Task.Delay(1000);
+                        await Task.Delay(5000);
                     }
                     TargetLabel.Content = "Target not found!";
                 }
