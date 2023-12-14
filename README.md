@@ -17,4 +17,6 @@ To make the window reappear, simply hover your cursor over the little bit thats 
 ![image](https://github.com/kris701/TopBarSharp/assets/22596587/2c9e9687-f059-4a13-bbc1-56716c319a48)
 
 The window will pop back up, when your cursor goes outside the bounds of the window.
+Your selected window will be saved, so the next time the program starts it will try and find the same window again (based on .exe name and window title). When it starts, it will try 10 times with a 1 sec delay in between to find the window, if it cannot find the window in that time, it will give up.
+
 And thats it! Hope you enjoy it!
