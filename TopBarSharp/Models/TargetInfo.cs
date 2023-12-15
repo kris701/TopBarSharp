@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace TopBarSharp.Models
 {
@@ -9,6 +10,7 @@ namespace TopBarSharp.Models
         public string ProcessName { get; set; }
         public string WindowName { get; set; }
 
+        [JsonConstructor]
         public TargetInfo(string processName, string windowName)
         {
             ProcessName = processName;
