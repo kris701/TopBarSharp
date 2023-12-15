@@ -47,7 +47,7 @@ namespace TopBarSharp.Views
         {
             if (File.Exists(_saveFile))
             {
-                _targetInfo = JsonSerializer.Deserialize<TargetInfo>(File.ReadAllText(_saveFile));
+                _targetInfo = new TargetInfo(_saveFile);
                 if (_targetInfo != null)
                 {
                     TargetLabel.Content = "Seaching...";
@@ -75,13 +75,7 @@ namespace TopBarSharp.Views
         private async void TargetButton_Click(object sender, RoutedEventArgs e)
         {
             ControlPanel.IsEnabled = false;
-            SelectorCountdownLabel.Visibility = Visibility.Visible;
-            for (int i = 3; i > 0; i--)
-            {
-                SelectorCountdownLabel.Content = $"{i}";
-                await Task.Delay(1000);
-            }
-            SelectorCountdownLabel.Visibility = Visibility.Hidden;
+            await SelectorCountdown(3);
 
             var pt = Win32APIManager.GetCursorPosition();
             var ptr = Win32APIManager.WindowFromPoint(pt.X, pt.Y);
@@ -94,13 +88,22 @@ namespace TopBarSharp.Views
             if (_targetProcess != null)
             {
                 _targetInfo = new TargetInfo(_targetProcess.ProcessName, _targetProcess.MainWindowTitle);
-                var text = JsonSerializer.Serialize(_targetInfo);
-                if (File.Exists(_saveFile))
-                    File.Delete(_saveFile);
-                File.WriteAllText(_saveFile, text);
+                _targetInfo.Save(_saveFile);
             }
 
             ControlPanel.IsEnabled = true;
+        }
+
+        private async Task SelectorCountdown(int count)
+        {
+            SelectorCountdownLabel.Content = $"{count}";
+            SelectorCountdownLabel.Visibility = Visibility.Visible;
+            for (int i = count; i > 0; i--)
+            {
+                SelectorCountdownLabel.Content = $"{i}";
+                await Task.Delay(1000);
+            }
+            SelectorCountdownLabel.Visibility = Visibility.Hidden;
         }
 
         private void SetTargetProcess(Process target)
@@ -139,8 +142,7 @@ namespace TopBarSharp.Views
                 if (!_shown)
                 {
                     var ptr = Win32APIManager.WindowFromPoint(pt.X, pt.Y);
-                    if ((ptr != IntPtr.Zero && _targetProcess.MainWindowHandle == ptr) ||
-                        (active != IntPtr.Zero && _targetProcess.MainWindowHandle == active))
+                    if (IsPtrTarget(ptr) || IsPtrTarget(active))
                     {
                         _shown = true;
                         Win32APIManager.Move(_targetProcess.MainWindowHandle, _targetProcessRect.Left, 0);
@@ -148,11 +150,8 @@ namespace TopBarSharp.Views
                 }
                 else
                 {
-                    if (!(pt.X >= _targetProcessRect.Left &&
-                        pt.X <= _targetProcessRect.Left + _targetProcessRect.Right &&
-                        pt.Y >= _targetProcessRect.Top &&
-                        pt.Y <= _targetProcessRect.Top + _targetProcessRect.Bottom) &&
-                        !(active != IntPtr.Zero && _targetProcess.MainWindowHandle == active))
+                    if (!_targetProcessRect.IsPointWithin(pt) &&
+                        !IsPtrTarget(active))
                     {
                         await Task.Delay(1000);
                         _shown = false;
@@ -161,6 +160,13 @@ namespace TopBarSharp.Views
                 }
             }
             _running = false;
+        }
+
+        private bool IsPtrTarget(IntPtr ptr)
+        {
+            if (ptr != IntPtr.Zero || _targetProcess == null)
+                return false;
+            return _targetProcess.MainWindowHandle == ptr;
         }
 
         private void StopButton_Click(object sender, RoutedEventArgs e)

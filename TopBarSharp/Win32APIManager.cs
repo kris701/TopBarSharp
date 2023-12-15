@@ -11,11 +11,14 @@ namespace TopBarSharp
 {
     public static class Win32APIManager
     {
+        // https://www.pixata.co.uk/2020/04/28/how-to-find-out-what-window-has-focus/
         [DllImport("user32.dll")]
         public static extern IntPtr GetForegroundWindow();
+        // https://stackoverflow.com/a/61769876
         [DllImport("user32.dll")]
         public static extern IntPtr WindowFromPoint(int x, int y);
 
+        // https://stackoverflow.com/a/6415255
         [DllImport("user32.dll")]
         private static extern bool GetWindowRect(IntPtr hwnd, ref MyRect rectangle);
         public static MyRect GetWindowLocation(IntPtr hwnd)
@@ -25,6 +28,7 @@ namespace TopBarSharp
             return rect;
         }
 
+        // https://stackoverflow.com/a/7648626
         [DllImport("user32.dll")]
         private static extern bool GetCursorPos(ref MyPoint lpPoint);
         public static MyPoint GetCursorPosition()
@@ -34,6 +38,7 @@ namespace TopBarSharp
             return lpPoint;
         }
 
+        // https://stackoverflow.com/a/1190447
         [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
         private static extern IntPtr SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int Y, int cx, int cy, int wFlags);
         public static void Move(IntPtr hwnd, int x, int y)
