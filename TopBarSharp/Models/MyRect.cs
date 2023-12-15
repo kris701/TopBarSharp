@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TopBarSharp.Models
+﻿namespace TopBarSharp.Models
 {
     public struct MyRect
     {
@@ -13,7 +7,7 @@ namespace TopBarSharp.Models
         public int Right { get; set; }
         public int Bottom { get; set; }
 
-        public bool IsPointWithin(MyPoint point) => 
+        public bool IsPointWithin(MyPoint point) =>
             (point.X >= Left &&
              point.X <= Left + Right &&
              point.Y >= Top &&
