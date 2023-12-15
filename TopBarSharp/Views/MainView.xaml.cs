@@ -152,7 +152,7 @@ namespace TopBarSharp.Views
 
         private bool IsPtrTarget(IntPtr ptr)
         {
-            if (ptr != IntPtr.Zero || _targetProcess == null)
+            if (ptr == IntPtr.Zero || _targetProcess == null)
                 return false;
             return _targetProcess.MainWindowHandle == ptr;
         }
