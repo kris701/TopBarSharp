@@ -60,6 +60,7 @@ namespace TopBarSharp.Views
                         if (target != null)
                         {
                             SetTargetProcess(target);
+                            StartButton.IsEnabled = true;
                             await Start();
                             return;
                         }
@@ -68,6 +69,7 @@ namespace TopBarSharp.Views
                     TargetLabel.Content = "Target not found!";
                 }
             }
+            StartButton.IsEnabled = true;
         }
 
         private async void TargetButton_Click(object sender, RoutedEventArgs e)

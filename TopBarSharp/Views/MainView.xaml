@@ -13,7 +13,7 @@
             <Button x:Name="TargetButton" Content="Target" Height="20" Click="TargetButton_Click" Style="{StaticResource StandartButtonStyle}"/>
             <Label x:Name="TargetLabel" Content="No Target" Height="30" Style="{StaticResource StandartLabelStyle}"/>
             <GridSplitter Grid.Row="1" Height="2" Margin="2" HorizontalAlignment="Stretch" Background="#FF2D2D5F"/>
-            <Button x:Name="StartButton" Content="Start" Height="20" Click="StartButton_Click" Style="{StaticResource StandartGreenButtonStyle}"/>
+            <Button x:Name="StartButton" Content="Start" Height="20" IsEnabled="False" Click="StartButton_Click" Style="{StaticResource StandartGreenButtonStyle}"/>
             <Button x:Name="StopButton" Content="Stop" Height="20" Click="StopButton_Click" Style="{StaticResource StandartExitButtonStyle}"/>
         </StackPanel>
         <Label x:Name="SelectorCountdownLabel" Content="3" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" Background="Red" Visibility="Hidden" Style="{StaticResource StandartLabelStyle}"/>
