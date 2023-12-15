@@ -133,10 +133,12 @@ namespace TopBarSharp.Views
             {
                 await Task.Delay(100);
                 var pt = Win32APIManager.GetCursorPosition();
+                var active = Win32APIManager.GetForegroundWindow();
                 if (!_shown)
                 {
                     var ptr = Win32APIManager.WindowFromPoint(pt.X, pt.Y);
-                    if (ptr != IntPtr.Zero && _targetProcess.MainWindowHandle == ptr)
+                    if ((ptr != IntPtr.Zero && _targetProcess.MainWindowHandle == ptr) ||
+                        (active != IntPtr.Zero && _targetProcess.MainWindowHandle == active))
                     {
                         _shown = true;
                         Win32APIManager.Move(_targetProcess.MainWindowHandle, _targetProcessRect.Left, 0);
@@ -147,7 +149,8 @@ namespace TopBarSharp.Views
                     if (!(pt.X >= _targetProcessRect.Left &&
                         pt.X <= _targetProcessRect.Left + _targetProcessRect.Right &&
                         pt.Y >= _targetProcessRect.Top &&
-                        pt.Y <= _targetProcessRect.Top + _targetProcessRect.Bottom))
+                        pt.Y <= _targetProcessRect.Top + _targetProcessRect.Bottom) &&
+                        !(active != IntPtr.Zero && _targetProcess.MainWindowHandle == active))
                     {
                         await Task.Delay(1000);
                         _shown = false;

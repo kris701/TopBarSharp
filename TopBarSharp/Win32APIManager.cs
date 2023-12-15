@@ -11,14 +11,13 @@ namespace TopBarSharp
 {
     public static class Win32APIManager
     {
-        [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
-        public static extern IntPtr SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int Y, int cx, int cy, int wFlags);
-
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetForegroundWindow();
         [DllImport("user32.dll")]
         public static extern IntPtr WindowFromPoint(int x, int y);
 
         [DllImport("user32.dll")]
-        public static extern bool GetWindowRect(IntPtr hwnd, ref MyRect rectangle);
+        private static extern bool GetWindowRect(IntPtr hwnd, ref MyRect rectangle);
         public static MyRect GetWindowLocation(IntPtr hwnd)
         {
             var rect = new MyRect();
@@ -27,7 +26,7 @@ namespace TopBarSharp
         }
 
         [DllImport("user32.dll")]
-        static extern bool GetCursorPos(ref MyPoint lpPoint);
+        private static extern bool GetCursorPos(ref MyPoint lpPoint);
         public static MyPoint GetCursorPosition()
         {
             var lpPoint = new MyPoint();
@@ -35,6 +34,8 @@ namespace TopBarSharp
             return lpPoint;
         }
 
+        [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
+        private static extern IntPtr SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int Y, int cx, int cy, int wFlags);
         public static void Move(IntPtr hwnd, int x, int y)
         {
             //const short SWP_NOMOVE = 0X2;
