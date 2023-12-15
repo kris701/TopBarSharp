@@ -1,4 +1,4 @@
-# TopBarSharp
+# <img src='https://github.com/kris701/TopBarSharp/assets/22596587/6b275939-4c25-4453-934e-c9f8ac7101b0' width='25'> TopBarSharp
 
 Ever wanted some widgets on your desktop, but gets annoyed that they are in the way most of the time and making so you cant see your wallpaper?
 Well here is the solution! TopBarSharp allows you to select a window, and make it hide itself in the top of your screen.
