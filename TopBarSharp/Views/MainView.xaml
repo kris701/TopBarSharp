@@ -5,12 +5,34 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TopBarSharp.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="140" d:DesignWidth="300" Loaded="UserControl_Loaded" Background="#721D2B40">
+             d:DesignHeight="170" d:DesignWidth="300" Loaded="UserControl_Loaded" Background="#721D2B40">
     <Grid VerticalAlignment="Center" Margin="2">
         <StackPanel x:Name="ControlPanel">
-            <Label Content="TopBarSharp" Height="30" Style="{StaticResource StandartLabelStyle}"/>
-            <GridSplitter Grid.Row="1" Height="2" Margin="2" HorizontalAlignment="Stretch" Background="#FF2D2D5F"/>
-            <Button x:Name="TargetButton" Content="Target" Height="20" Click="TargetButton_Click" Style="{StaticResource StandartButtonStyle}"/>
+            <StackPanel x:Name="TargetPanel">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Label Content="TopBarSharp" Height="30" Style="{StaticResource StandartLabelStyle}"/>
+                    <Button x:Name="GitButton" Grid.Column="1" Content="Github" Style="{StaticResource StandartButtonStyle}" Click="GitButton_Click"/>
+                </Grid>
+                <GridSplitter Grid.Row="1" Height="2" Margin="2" HorizontalAlignment="Stretch" Background="#FF2D2D5F"/>
+                <Button x:Name="TargetButton" Content="Target With Cursor" Height="20" Click="TargetButton_Click" Style="{StaticResource StandartButtonStyle}">
+                    <Button.ToolTip>
+                        You can select a target window with your cursor.
+                    Click this button, and you then have 3 seconds to hover your cursor over the window you want.
+                    (it may help to click on the window title bar too)
+                    </Button.ToolTip>
+                </Button>
+                <TextBox x:Name="TargetTextbox" Height="30" Style="{StaticResource StandartTextBoxStyle}" KeyDown="TargetTextbox_KeyDown">
+                    <TextBox.ToolTip>
+                        You can write the target of the window you want to select here.
+                    This will be the direct name of that window, for example if you wanted to target Discord,
+                    you have to write "Discord" here. You can use the wildcard "*" here too.
+                    </TextBox.ToolTip>
+                </TextBox>
+            </StackPanel>
             <Label x:Name="TargetLabel" Content="No Target" Height="30" Style="{StaticResource StandartLabelStyle}"/>
             <GridSplitter Grid.Row="1" Height="2" Margin="2" HorizontalAlignment="Stretch" Background="#FF2D2D5F"/>
             <Button x:Name="StartButton" Content="Start" Height="20" IsEnabled="False" Click="StartButton_Click" Style="{StaticResource StandartGreenButtonStyle}"/>

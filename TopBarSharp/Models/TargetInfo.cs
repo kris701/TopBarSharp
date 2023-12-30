@@ -7,17 +7,20 @@ namespace TopBarSharp.Models
 {
     public class TargetInfo
     {
-        public string ProcessName { get; set; }
         public string WindowName { get; set; }
 
         [JsonConstructor]
-        public TargetInfo(string processName, string windowName)
+        public TargetInfo(string windowName)
         {
-            ProcessName = processName;
             WindowName = windowName;
         }
 
-        public TargetInfo(string path)
+        public TargetInfo()
+        {
+            WindowName = "None";
+        }
+
+        public void Load(string path)
         {
             if (!File.Exists(path))
                 throw new IOException("Save file not found!");
@@ -25,7 +28,6 @@ namespace TopBarSharp.Models
             if (tempInfo == null)
                 throw new Exception("Could not deserialise save file!");
 
-            ProcessName = tempInfo.ProcessName;
             WindowName = tempInfo.WindowName;
         }
 

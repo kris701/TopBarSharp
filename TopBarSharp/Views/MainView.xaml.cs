@@ -3,6 +3,8 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Policy;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,7 +16,7 @@ namespace TopBarSharp.Views
     {
         public UIElement Element { get; }
         public double TargetWidth { get; } = 300;
-        public double TargetHeight { get; } = 140;
+        public double TargetHeight { get; } = 170;
 
         private int _selectorOffset = 20;
         private Process? _targetProcess;
@@ -35,29 +37,28 @@ namespace TopBarSharp.Views
         {
             if (File.Exists(_saveFile))
             {
-                _targetInfo = new TargetInfo(_saveFile);
+                _targetInfo = new TargetInfo();
+                _targetInfo.Load(_saveFile);
+                TargetTextbox.Text = _targetInfo.WindowName;
                 if (_targetInfo != null)
                 {
                     TargetLabel.Content = "Seaching...";
-                    Process? target = null;
-                    for (int i = 0; i < 10; i++)
+                    while(true)
                     {
                         if (_stop)
                             break;
-                        target = Process.GetProcesses().SingleOrDefault(p => p.ProcessName == _targetInfo.ProcessName && p.MainWindowTitle == _targetInfo.WindowName);
+                        Process? target = FindTarget(_targetInfo.WindowName);
                         if (target != null)
                         {
-                            SetTargetProcess(target);
-                            StartButton.IsEnabled = true;
+                            SetTargetProcess(target, _targetInfo.WindowName);
                             await Start();
                             return;
                         }
-                        await Task.Delay(5000);
+                        await Task.Delay(1000);
                     }
                     TargetLabel.Content = "Target not found!";
                 }
             }
-            StartButton.IsEnabled = true;
         }
 
         private async void TargetButton_Click(object sender, RoutedEventArgs e)
@@ -69,14 +70,9 @@ namespace TopBarSharp.Views
             var ptr = Win32APIManager.WindowFromPoint(pt.X, pt.Y);
             if (ptr != IntPtr.Zero)
             {
-                var target = Process.GetProcesses().SingleOrDefault(p => p.MainWindowHandle == ptr);
+                var target = Process.GetProcesses().FirstOrDefault(p => p.MainWindowHandle == ptr);
                 if (target != null)
-                    SetTargetProcess(target);
-            }
-            if (_targetProcess != null)
-            {
-                _targetInfo = new TargetInfo(_targetProcess.ProcessName, _targetProcess.MainWindowTitle);
-                _targetInfo.Save(_saveFile);
+                    SetTargetProcess(target, target.MainWindowTitle);
             }
 
             ControlPanel.IsEnabled = true;
@@ -94,10 +90,13 @@ namespace TopBarSharp.Views
             SelectorCountdownLabel.Visibility = Visibility.Hidden;
         }
 
-        private void SetTargetProcess(Process target)
+        private void SetTargetProcess(Process target, string name)
         {
             _targetProcess = target;
-            TargetLabel.Content = $"({_targetProcess.ProcessName}) {_targetProcess.MainWindowTitle}";
+            TargetLabel.Content = $"{_targetProcess.MainWindowTitle}";
+            _targetInfo = new TargetInfo(name);
+            _targetInfo.Save(_saveFile);
+            StartButton.IsEnabled = true;
         }
 
         private async void StartButton_Click(object sender, RoutedEventArgs e)
@@ -116,6 +115,8 @@ namespace TopBarSharp.Views
                 await Task.Delay(100);
             }
 
+            TargetPanel.IsEnabled = false;
+            StartButton.IsEnabled = false;
             _running = true;
             _targetProcessRect = Win32APIManager.GetWindowLocation(_targetProcess.MainWindowHandle);
             Win32APIManager.Move(_targetProcess.MainWindowHandle, _targetProcessRect.Left, 0);
@@ -148,6 +149,8 @@ namespace TopBarSharp.Views
                 }
             }
             _running = false;
+            StartButton.IsEnabled = true;
+            TargetPanel.IsEnabled = true;
         }
 
         private bool IsPtrTarget(IntPtr ptr)
@@ -168,6 +171,46 @@ namespace TopBarSharp.Views
             if (_targetProcess == null)
                 return;
             Win32APIManager.Move(_targetProcess.MainWindowHandle, _targetProcessRect.Left, 0);
+        }
+
+        private void GitButton_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo { FileName = "https://github.com/kris701/TopBarSharp", UseShellExecute = true });
+        }
+
+        private async void TargetTextbox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (TargetTextbox.Text == "")
+                return;
+
+            TargetLabel.Content = "Seaching...";
+            await Task.Delay(10);
+            Process? target = FindTarget(TargetTextbox.Text);
+            if (target != null)
+            {
+                SetTargetProcess(target, TargetTextbox.Text);
+                return;
+            }
+            await Task.Delay(1000);
+            TargetLabel.Content = "Target not found!";
+        }
+
+        private Process? FindTarget(string windowName)
+        {
+            var processes = Process.GetProcesses();
+            var regularWindowName = WildCardToRegular(windowName);
+            foreach (var process in processes)
+            {
+                if (Regex.IsMatch(process.MainWindowTitle, regularWindowName))
+                    return process;
+            }
+            return null;
+        }
+
+        //https://stackoverflow.com/a/30300521
+        private string WildCardToRegular(string value)
+        {
+            return "^" + Regex.Escape(value).Replace("\\*", ".*") + "$";
         }
     }
 }
